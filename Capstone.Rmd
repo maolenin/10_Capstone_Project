@@ -1,0 +1,86 @@
+---
+title: "Capstone"
+author: "Mao Soldevilla"
+date: "2026-07-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+JHU project Capstone
+Dataset:
+<https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip>
+donwloaded to data
+
+## 1. Data Exploratory
+
+### Loading Lybraries
+
+```{r libraries, cache = TRUE, comment=FALSE}
+library(tidyverse)
+#library(ggplot2)
+#library(caret)
+#library(AppliedPredictiveModeling)
+#library(dplyr)
+```
+
+### Downloading data
+```{r data_setting, cache = TRUE}
+# Definets paths for download and save the working files
+url1 <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
+target_dir <- "data/original"
+
+# Run if the file doens't exist.
+if (!dir.exists(target_dir)) {
+  
+  # Make sure the target folder structure exists
+  dir.create(target_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  # 2. Create a temporary folder and download file
+  tmp_dir <- tempdir()
+  tmp_zip <- file.path(tmp_dir, "Coursera-SwiftKey.zip")
+  
+  message("Downloading dataset (this may take a few minutes)...")
+  download.file(url, destfile = tmp_zip, mode = "wb")
+  
+  # 3. Unzip the file inside the temporary directory
+  message("Unzipping files...")
+  unzip(tmp_zip, exdir = tmp_dir)
+  
+  # The dataset unzips into a folder path: tmp_dir/final/en_US/
+  extracted_en_us <- file.path(tmp_dir, "final", "en_US")
+  
+  # 4. Identify the extracted files and move them to data/original
+  files_to_move <- list.files(extracted_en_us, full.names = TRUE)
+  
+  message("Moving en_US files into project directory...")
+  file.copy(from = files_to_move, to = target_dir, overwrite = TRUE)
+  
+  # Clean up the temporary zip file cleanly
+  file.remove(tmp_zip)
+  message("Data setup complete!")
+  
+  } else {
+  message("Target directory 'data/original' already exists. Skipping download.")
+  }
+```
+
+### Loading data 
+
+```{r data_exporatory, cache = TRUE}
+  file <- "data/original/en_US.blogs.txt"
+  all_lines <- read_lines(file)
+  dim(all_lines)
+  set.seed(123)
+  sampled_lines <- sample(all_lines, size = length(all_lines)*.05)
+  
+  text_data <- tibble(line_id = 1:length(sampled_lines), text = sampled_lines)
+
+  # View your sampled data structure
+  print(text_data)
+```
+
